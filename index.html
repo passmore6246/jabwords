@@ -24,12 +24,16 @@
   #results-links button { background: none; border: 1px solid var(--border); color: var(--fg); border-radius: 16px;
     padding: 6px 14px; font-size: 14px; font-weight: bold; cursor: pointer; }
   #hint { min-height: 22px; margin: 8px 12px 0; color: var(--muted); font-size: 15px; text-align: center; }
-  #board-wrap { flex: 1; display: flex; align-items: center; justify-content: center; width: 100%; padding: 8px; min-height: 0; }
+  #board-wrap { flex: 1; display: flex; align-items: center; justify-content: center; width: 100%; padding: 8px; min-height: 0; position: relative; }
+  #pic { position: absolute; inset: 0; margin: 0 auto; max-width: 500px; background: center / cover no-repeat;
+    opacity: 0; transition: opacity 1s, filter 1s; pointer-events: none; }
+  #board { position: relative; }
+  .pic-thumb { display: block; width: 140px; height: 140px; object-fit: cover; border-radius: 8px; margin: 0 auto 12px; }
   #board { display: grid; grid-template-rows: repeat(6, 1fr); gap: 5px; }
   .row { display: grid; gap: 5px; }
   .tile { width: var(--tile); height: var(--tile); border: 2px solid var(--border); display: flex;
     align-items: center; justify-content: center; font-size: calc(var(--tile) * 0.55); font-weight: bold;
-    text-transform: uppercase; user-select: none; }
+    text-transform: uppercase; user-select: none; background: rgba(18,18,19,0.6); }
   .tile.filled { border-color: #565758; animation: pop 0.1s; }
   .tile.correct, .tile.present, .tile.absent { border-color: transparent; }
   .tile.correct { background: var(--correct); }
@@ -96,7 +100,7 @@
     <button data-open="all">🏆 All-time results</button>
   </div>
   <div id="hint"></div>
-  <div id="board-wrap"><div id="board"></div></div>
+  <div id="board-wrap"><div id="pic"></div><div id="board"></div></div>
   <div id="keyboard"></div>
   <div id="toast"></div>
 
@@ -174,6 +178,22 @@
   const nextPuzzle = puzzles[idx + 1];
   $("puzzle-num").textContent = `#${NUM}${previewDate ? " (preview)" : ""}`;
   $("hint").textContent = puzzle.hint || "";
+
+  // ---- Picture reveal ------------------------------------------------------
+  // Hidden until the first miss, then starts very blurry and sharpens with each miss.
+  // Shown clearly once the puzzle is finished.
+  const PIC = puzzle.image || "";
+  if (PIC) $("pic").style.backgroundImage = `url("${PIC}")`;
+  const BLUR = [null, 28, 18, 11, 6, 3];
+  function updatePic(done) {
+    if (!PIC) return;
+    const el = $("pic");
+    const misses = state ? state.guesses.filter(g => g !== ANSWER).length : 0;
+    if (done) { el.style.filter = "none"; el.style.opacity = "0.6"; return; }
+    if (!misses) { el.style.opacity = "0"; return; }
+    el.style.filter = `blur(${BLUR[Math.min(misses, 5)]}px)`;
+    el.style.opacity = "0.45";
+  }
 
   // ---- Storage -------------------------------------------------------------
   const store = (k, v) => { if (!previewDate) localStorage.setItem(k, JSON.stringify(v)); };
@@ -358,6 +378,7 @@
     }
 
     state.guesses.forEach((g, r) => { const res = score(g); paintRow(r, g, res, false); colorKeys(g, res); });
+    updatePic(state.done);
     if (state.done) {
       submitResult().then(() => setTimeout(showResults, 300));
     } else if (!localStorage.getItem("ww-seen-help")) {
@@ -396,6 +417,7 @@
     setTimeout(async () => {
       busy = false;
       colorKeys(guess, result);
+      updatePic(state.done);
       if (won) toast(["Genius!", "Magnificent!", "Impressive!", "Splendid!", "Great!", "Phew!"][r]);
       else if (lost) toast(ANSWER, 2500);
       if (saving) { await saving; setTimeout(showResults, won ? 1200 : 1800); }
@@ -414,7 +436,7 @@
   function weekHTML() {
     const rows = server.results.filter(r => r.week === puzzle.start)
       .sort((a, b) => (b.won - a.won) || (a.guesses - b.guesses));
-    let h = `<div class="answer">This week's word: <b>${ANSWER}</b></div>`;
+    let h = (PIC ? `<img class="pic-thumb" src="${PIC}" alt="">` : "") + `<div class="answer">This week's word: <b>${ANSWER}</b></div>`;
     if (!rows.length) h += `<p class="muted">No results yet.</p>`;
     rows.forEach((r, i) => {
       h += `<div class="week-row"><span class="rank">${i + 1}</span>

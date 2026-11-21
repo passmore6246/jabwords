@@ -25,6 +25,9 @@
   <input id="start" type="date">
   <label for="hint">Hint (optional)</label>
   <input id="hint" placeholder="e.g. Taco Tuesday week">
+  <label for="pic">Picture (optional)</label>
+  <input id="pic" type="file" accept="image/*">
+  <p class="muted" id="pic-note">Pick the picture for this week. You'll get a random file name to save it under in the <code>images</code> folder.</p>
   <button id="go">Make line</button>
   <p id="err" class="err"></p>
   <pre id="out" hidden></pre>
@@ -43,8 +46,16 @@
     if (!/^[A-Z]{4,8}$/.test(word)) { $("err").textContent = "Use 4 to 8 letters, A–Z only."; return; }
     if (!$("start").value) { $("err").textContent = "Pick a date."; return; }
     const code = btoa(word.split("").reverse().join(""));
+    const file = $("pic").files[0];
+    let image = "";
+    if (file) {
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+      const rand = Array.from(crypto.getRandomValues(new Uint8Array(5)), b => b.toString(16).padStart(2, "0")).join("");
+      image = `images/${rand}.${ext}`;
+      $("pic-note").innerHTML = `Rename <b>${file.name.replace(/</g, "&lt;")}</b> to <b>${rand}.${ext}</b> and upload it to the <code>images</code> folder.`;
+    }
     const hint = $("hint").value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-    $("out").textContent = `  { start: "${$("start").value}", code: "${code}", hint: "${hint}" },`;
+    $("out").textContent = `  { start: "${$("start").value}", code: "${code}", hint: "${hint}"${image ? `, image: "${image}"` : ""} },`;
     $("out").hidden = false;
     $("copy").hidden = false;
   };

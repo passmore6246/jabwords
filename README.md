@@ -21,6 +21,16 @@ You can queue up as many weeks ahead as you like. Each puzzle stays live until t
 
 Words are scrambled, not encrypted. A friend who digs through the code could decode them, but they won't see them by accident.
 
+### Weekly picture (optional)
+
+Each week can have a picture that slowly reveals itself. It's hidden until someone's first wrong guess, then starts very blurry and gets clearer with every miss. When they finish, it's shown clearly and also appears in the weekly results.
+
+1. In `admin.html`, choose the picture along with the word. It gives you a random file name.
+2. Rename your picture to that name and upload it to the `images` folder on GitHub (**Add file → Upload files**, and type `images/` before the name, or open the `images` folder first).
+3. Paste the line from `admin.html` into `words.js` as usual. It includes the picture.
+
+Use a random file name so friends can't guess the picture's address. Keep pictures under about 500 KB so they load fast on phones.
+
 To check a future week before it goes live, add `?date=` to the address, for example `.../index.html?date=2026-12-08`. Preview games aren't saved.
 
 ## Group results
