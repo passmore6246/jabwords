@@ -30,7 +30,7 @@ Each week can have a photo from the group. It sits heavily blurred behind the bo
 
 **The easy way (with Claude):**
 1. Put photos in the `photos-inbox` folder. JPEG works best. On iPhone, share or export as JPEG, or set Settings > Camera > Formats > Most Compatible.
-2. Ask Claude to "pick words for my new photos." Claude suggests a few five-letter words for each photo, and you choose.
+2. Ask Claude to "pick words for my new photos." Claude picks a five-letter word for each photo and keeps it secret, so you can play too.
 3. Claude shrinks each photo, removes hidden location data, schedules one per week, and publishes when you say so.
 
 **Photos stay private.** They're kept in a Google Drive folder called **JABwords Photos** that's shared with no one, never on GitHub. The game gets only the current week's photo through the results script, so nobody can browse the photos or peek at future weeks. Anyone who opens the game link can see that week's photo.
