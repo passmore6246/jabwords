@@ -9,6 +9,9 @@ A weekly word game for your group chat. You pick each week's word. Your friends 
 | `index.html` | The game. |
 | `words.js` | Your list of weekly words. This is the only file you edit each week. |
 | `admin.html` | A small page that scrambles a word into a line you paste into `words.js`. |
+| `tools/prepare-photo.ps1` | Shrinks a photo, fixes rotation, removes location data, and saves it as `photos-ready/<week>.jpg`. |
+| `photos-inbox/` | Drop new group photos here. Never uploaded. |
+| `photos-ready/` | Prepared photos waiting to go to the private Drive folder. |
 | `apps-script/Code.gs` | The results server. A copy of what's in the Google Sheet's Apps Script. |
 
 ## Adding words
@@ -21,15 +24,18 @@ You can queue up as many weeks ahead as you like. Each puzzle stays live until t
 
 Words are scrambled, not encrypted. A friend who digs through the code could decode them, but they won't see them by accident.
 
-### Weekly picture (optional)
+### Weekly photos
 
-Each week can have a picture that slowly reveals itself. It's hidden until someone's first wrong guess, then starts very blurry and gets clearer with every miss. When they finish, it's shown clearly and also appears in the weekly results.
+Each week can have a photo from the group. It sits heavily blurred behind the board the whole game and only turns clear when the puzzle ends, win or lose. It also shows at the top of the weekly results.
 
-1. In `admin.html`, choose the picture along with the word. It gives you a random file name.
-2. Rename your picture to that name and upload it to the `images` folder on GitHub (**Add file → Upload files**, and type `images/` before the name, or open the `images` folder first).
-3. Paste the line from `admin.html` into `words.js` as usual. It includes the picture.
+**The easy way (with Claude):**
+1. Put photos in the `photos-inbox` folder. JPEG works best. On iPhone, share or export as JPEG, or set Settings > Camera > Formats > Most Compatible.
+2. Ask Claude to "pick words for my new photos." Claude suggests a few five-letter words for each photo, and you choose.
+3. Claude shrinks each photo, removes hidden location data, schedules one per week, and publishes when you say so.
 
-Use a random file name so friends can't guess the picture's address. Keep pictures under about 500 KB so they load fast on phones.
+**Photos stay private.** They're kept in a Google Drive folder called **JABwords Photos** that's shared with no one, never on GitHub. The game gets only the current week's photo through the results script, so nobody can browse the photos or peek at future weeks. Anyone who opens the game link can see that week's photo.
+
+To add a photo by hand, shrink it, name it after its week (for example `2026-11-30.jpg`), and put it in the **JABwords Photos** folder.
 
 To check a future week before it goes live, add `?date=` to the address, for example `.../index.html?date=2026-12-08`. Preview games aren't saved.
 
