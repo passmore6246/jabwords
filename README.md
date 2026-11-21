@@ -48,6 +48,10 @@ Players pick their name from a list when they open the game. When they finish, t
 - Each person counts once per week. If they open the game on a second phone, it shows the results instead of a new game.
 - The Sheet's web app link is saved in `words.js` as `RESULTS_URL`. If you ever redeploy the script as a *new* deployment, update that link.
 
+## Guest link (for people outside the group)
+
+Send outsiders **https://passmore6246.github.io/jabwords/?guest** instead of the regular link. Guests play the same weekly puzzle and photo, but they don't pick a name, their result is never saved, and the group's weekly and all-time results are hidden from them. They can still tap **Share** to send you their score.
+
 ## Putting it online (free, using GitHub Pages)
 
 1. Make a free account at github.com.
