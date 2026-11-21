@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>JABwords</title>
+<style>
+  :root {
+    --bg: #121213; --fg: #f8f8f8; --muted: #818384; --border: #3a3a3c;
+    --key: #818384; --correct: #538d4e; --present: #b59f3b; --absent: #3a3a3c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg);
+    font-family: "Helvetica Neue", Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+  body { display: flex; flex-direction: column; align-items: center; height: 100dvh; }
+  header { width: 100%; max-width: 500px; display: flex; align-items: center;
+    justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  header h1 { margin: 0; font-size: 26px; letter-spacing: 1px; }
+  header .sub { font-size: 13px; color: var(--muted); text-align: center; }
+  .icon-btn { background: none; border: 1px solid var(--border); color: var(--fg); border-radius: 6px;
+    font-size: 15px; padding: 6px 10px; cursor: pointer; }
+  #hint { min-height: 22px; margin: 8px 12px 0; color: var(--muted); font-size: 15px; text-align: center; }
+  #board-wrap { flex: 1; display: flex; align-items: center; justify-content: center; width: 100%; padding: 8px; min-height: 0; }
+  #board { display: grid; grid-template-rows: repeat(6, 1fr); gap: 5px; }
+  .row { display: grid; gap: 5px; }
+  .tile { width: var(--tile); height: var(--tile); border: 2px solid var(--border); display: flex;
+    align-items: center; justify-content: center; font-size: calc(var(--tile) * 0.55); font-weight: bold;
+    text-transform: uppercase; user-select: none; }
+  .tile.filled { border-color: #565758; animation: pop 0.1s; }
+  .tile.correct, .tile.present, .tile.absent { border-color: transparent; }
+  .tile.correct { background: var(--correct); }
+  .tile.present { background: var(--present); }
+  .tile.absent  { background: var(--absent); }
+  .tile.flip { animation: flip 0.5s ease forwards; }
+  .row.shake { animation: shake 0.4s; }
+  @keyframes pop { 50% { transform: scale(1.1); } }
+  @keyframes flip { 0% { transform: rotateX(0); } 50% { transform: rotateX(90deg); } 100% { transform: rotateX(0); } }
+  @keyframes shake { 20%,60% { transform: translateX(-6px); } 40%,80% { transform: translateX(6px); } }
+  #keyboard { width: 100%; max-width: 500px; padding: 0 6px 10px; }
+  .krow { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px; }
+  .key { flex: 1; height: 58px; border: 0; border-radius: 4px; background: var(--key); color: var(--fg);
+    font-size: 14px; font-weight: bold; cursor: pointer; text-transform: uppercase; padding: 0; }
+  .key.wide { flex: 1.5; font-size: 12px; }
+  .key.correct { background: var(--correct); } .key.present { background: var(--present); } .key.absent { background: var(--absent); }
+  .spacer { flex: 0.5; }
+  #toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: var(--fg); color: var(--bg);
+    padding: 12px 16px; border-radius: 6px; font-weight: bold; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 20; }
+  #toast.show { opacity: 1; }
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 10; }
+  .modal-bg.show { display: flex; }
+  .modal { background: #1e1e1f; border: 1px solid var(--border); border-radius: 10px; width: min(92vw, 420px);
+    padding: 20px; position: relative; max-height: 90vh; overflow-y: auto; }
+  .modal h2 { margin: 0 0 12px; text-align: center; font-size: 18px; letter-spacing: 1px; }
+  .close { position: absolute; top: 8px; right: 12px; background: none; border: 0; color: var(--fg); font-size: 22px; cursor: pointer; }
+  .stats { display: flex; justify-content: space-around; text-align: center; margin-bottom: 16px; }
+  .stats div b { display: block; font-size: 30px; }
+  .stats div span { font-size: 12px; }
+  .dist-row { display: flex; align-items: center; gap: 6px; margin: 4px 0; font-size: 14px; }
+  .dist-bar { background: var(--absent); padding: 2px 8px; text-align: right; font-weight: bold; min-width: 22px; }
+  .dist-bar.hi { background: var(--correct); }
+  .answer { text-align: center; font-size: 15px; margin: 12px 0; }
+  .answer b { letter-spacing: 3px; }
+  #share-btn { display: block; margin: 16px auto 0; background: var(--correct); color: #fff; border: 0; border-radius: 24px;
+    font-size: 18px; font-weight: bold; padding: 12px 32px; cursor: pointer; }
+  .next { text-align: center; color: var(--muted); font-size: 14px; margin-top: 10px; }
+  .help p { line-height: 1.4; font-size: 15px; }
+  .ex { display: flex; gap: 4px; margin: 6px 0; } .ex .tile { --tile: 36px; }
+</style>
+</head>
+<body>
+  <header>
+    <button class="icon-btn" id="help-open" aria-label="How to play">?</button>
+    <div>
+      <h1 id="title">JABwords</h1>
+      <div class="sub" id="puzzle-num"></div>
+    </div>
+    <button class="icon-btn" id="stats-open" aria-label="Statistics">📊</button>
+  </header>
+  <div id="hint"></div>
+  <div id="board-wrap"><div id="board"></div></div>
+  <div id="keyboard"></div>
+  <div id="toast"></div>
+
+  <div class="modal-bg" id="stats-modal">
+    <div class="modal">
+      <button class="close" data-close>&times;</button>
+      <h2>STATISTICS</h2>
+      <div class="stats" id="stats-nums"></div>
+      <h2>GUESS DISTRIBUTION</h2>
+      <div id="dist"></div>
+      <div class="answer" id="answer"></div>
+      <button id="share-btn">Share 📤</button>
+      <div class="next" id="next"></div>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="help-modal">
+    <div class="modal help">
+      <button class="close" data-close>&times;</button>
+      <h2>HOW TO PLAY</h2>
+      <p>Guess this week's word in 6 tries. There's one new word each week, picked by hand.</p>
+      <p>After each guess, the tiles change color:</p>
+      <div class="ex"><div class="tile correct">G</div><div class="tile">R</div><div class="tile">A</div><div class="tile">V</div><div class="tile">Y</div></div>
+      <p><b>Green</b>: right letter, right spot.</p>
+      <div class="ex"><div class="tile">F</div><div class="tile present">R</div><div class="tile">O</div><div class="tile">S</div><div class="tile">T</div></div>
+      <p><b>Yellow</b>: the letter is in the word, but in a different spot.</p>
+      <div class="ex"><div class="tile">C</div><div class="tile">A</div><div class="tile">B</div><div class="tile absent">I</div><div class="tile">N</div></div>
+      <p><b>Gray</b>: the letter isn't in the word.</p>
+      <p>When you're done, tap <b>Share</b> and paste your result in the group chat.</p>
+    </div>
+  </div>
+
+<script src="words.js"></script>
+<script>
+(() => {
+  const MAX_GUESSES = 6;
+  const NAME = window.GAME_NAME || "JABwords";
+  const $ = id => document.getElementById(id);
+  const decode = c => atob(c).split("").reverse().join("").toUpperCase();
+  const pad = n => String(n).padStart(2, "0");
+  const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+  document.title = NAME;
+  $("title").textContent = NAME;
+
+  // ---- Pick this week's puzzle -------------------------------------------
+  // ?date=YYYY-MM-DD lets you preview another week (progress isn't saved).
+  const params = new URLSearchParams(location.search);
+  const previewDate = /^\d{4}-\d{2}-\d{2}$/.test(params.get("date") || "") ? params.get("date") : null;
+  const today = previewDate || ymd(new Date());
+  const puzzles = [...(window.WEEKLY_PUZZLES || [])].sort((a, b) => a.start.localeCompare(b.start));
+  let idx = -1;
+  puzzles.forEach((p, i) => { if (p.start <= today) idx = i; });
+
+  if (idx === -1) {
+    $("hint").textContent = puzzles.length
+      ? `The first puzzle starts ${puzzles[0].start}. Check back then!`
+      : "No puzzles yet.";
+    return;
+  }
+
+  const puzzle = puzzles[idx];
+  const ANSWER = decode(puzzle.code);
+  const LEN = ANSWER.length;
+  const NUM = idx + 1;
+  const nextPuzzle = puzzles[idx + 1];
+  $("puzzle-num").textContent = `#${NUM} · week of ${puzzle.start}${previewDate ? " (preview)" : ""}`;
+  $("hint").textContent = puzzle.hint || "";
+
+  // ---- Saved progress ------------------------------------------------------
+  const STATE_KEY = `ww-state-${puzzle.start}`;
+  const STATS_KEY = "ww-stats";
+  const save = (k, v) => { if (!previewDate) localStorage.setItem(k, JSON.stringify(v)); };
+  const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch { return d; } };
+
+  let state = previewDate ? null : load(STATE_KEY, null);
+  if (!state || state.answerLen !== LEN) state = { guesses: [], done: false, won: false, answerLen: LEN };
+  let stats = load(STATS_KEY, { played: 0, wins: 0, streak: 0, maxStreak: 0, dist: [0,0,0,0,0,0], lastWinNum: 0 });
+  let current = "";
+  let busy = false;
+
+  // ---- Scoring (handles repeated letters correctly) ------------------------
+  function score(guess) {
+    const res = Array(LEN).fill("absent");
+    const left = {};
+    for (let i = 0; i < LEN; i++) {
+      if (guess[i] === ANSWER[i]) res[i] = "correct";
+      else left[ANSWER[i]] = (left[ANSWER[i]] || 0) + 1;
+    }
+    for (let i = 0; i < LEN; i++) {
+      if (res[i] !== "correct" && left[guess[i]] > 0) { res[i] = "present"; left[guess[i]]--; }
+    }
+    return res;
+  }
+
+  // ---- Board ---------------------------------------------------------------
+  const board = $("board");
+  function sizeTiles() {
+    const wrap = $("board-wrap");
+    const byW = (Math.min(wrap.clientWidth, 480) - 16 - (LEN - 1) * 5) / LEN;
+    const byH = (wrap.clientHeight - 16 - 5 * 5) / MAX_GUESSES;
+    board.style.setProperty("--tile", Math.max(28, Math.min(62, byW, byH)) + "px");
+  }
+  for (let r = 0; r < MAX_GUESSES; r++) {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.style.gridTemplateColumns = `repeat(${LEN}, 1fr)`;
+    for (let c = 0; c < LEN; c++) {
+      const t = document.createElement("div");
+      t.className = "tile";
+      row.appendChild(t);
+    }
+    board.appendChild(row);
+  }
+  const rowEl = r => board.children[r];
+  const tileEl = (r, c) => rowEl(r).children[c];
+
+  function paintRow(r, word, result, animate) {
+    for (let c = 0; c < LEN; c++) {
+      const t = tileEl(r, c);
+      t.textContent = word[c];
+      if (animate) {
+        setTimeout(() => {
+          t.classList.add("flip");
+          setTimeout(() => t.classList.add(result[c]), 250);
+        }, c * 250);
+      } else {
+        t.classList.add(result[c]);
+      }
+    }
+  }
+
+  function drawCurrent() {
+    const r = state.guesses.length;
+    if (r >= MAX_GUESSES) return;
+    for (let c = 0; c < LEN; c++) {
+      const t = tileEl(r, c);
+      t.textContent = current[c] || "";
+      t.classList.toggle("filled", !!current[c]);
+    }
+  }
+
+  // ---- Keyboard ------------------------------------------------------------
+  const RANK = { absent: 1, present: 2, correct: 3 };
+  const keyEls = {};
+  const layout = ["QWERTYUIOP", "ASDFGHJKL", "+ZXCVBNM-"];
+  layout.forEach((line, i) => {
+    const row = document.createElement("div");
+    row.className = "krow";
+    if (i === 1) row.appendChild(Object.assign(document.createElement("div"), { className: "spacer" }));
+    for (const ch of line) {
+      const b = document.createElement("button");
+      b.className = "key";
+      if (ch === "+") { b.textContent = "Enter"; b.classList.add("wide"); b.dataset.k = "ENTER"; }
+      else if (ch === "-") { b.textContent = "⌫"; b.classList.add("wide"); b.dataset.k = "BACK"; }
+      else { b.textContent = ch; b.dataset.k = ch; keyEls[ch] = b; }
+      row.appendChild(b);
+    }
+    if (i === 1) row.appendChild(Object.assign(document.createElement("div"), { className: "spacer" }));
+    $("keyboard").appendChild(row);
+  });
+  $("keyboard").addEventListener("click", e => {
+    const b = e.target.closest(".key");
+    if (b) { press(b.dataset.k); b.blur(); }
+  });
+  document.addEventListener("keydown", e => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === "Enter") press("ENTER");
+    else if (e.key === "Backspace") press("BACK");
+    else if (/^[a-z]$/i.test(e.key)) press(e.key.toUpperCase());
+  });
+
+  function colorKeys(word, result) {
+    for (let i = 0; i < word.length; i++) {
+      const k = keyEls[word[i]];
+      if (!k) continue;
+      const prev = k.dataset.s;
+      if (!prev || RANK[result[i]] > RANK[prev]) {
+        if (prev) k.classList.remove(prev);
+        k.classList.add(result[i]);
+        k.dataset.s = result[i];
+      }
+    }
+  }
+
+  // ---- Game flow -----------------------------------------------------------
+  function press(k) {
+    if (state.done || busy) return;
+    if (k === "BACK") current = current.slice(0, -1);
+    else if (k === "ENTER") return submit();
+    else if (current.length < LEN) current += k;
+    drawCurrent();
+  }
+
+  function submit() {
+    const r = state.guesses.length;
+    if (current.length < LEN) {
+      toast("Not enough letters");
+      rowEl(r).classList.remove("shake"); void rowEl(r).offsetWidth; rowEl(r).classList.add("shake");
+      return;
+    }
+    const guess = current;
+    const result = score(guess);
+    state.guesses.push(guess);
+    current = "";
+    busy = true;
+    paintRow(r, guess, result, true);
+    const won = guess === ANSWER;
+    const lost = !won && state.guesses.length >= MAX_GUESSES;
+    if (won || lost) { state.done = true; state.won = won; recordStats(); }
+    save(STATE_KEY, state);
+    setTimeout(() => {
+      busy = false;
+      colorKeys(guess, result);
+      if (won) {
+        toast(["Genius!", "Magnificent!", "Impressive!", "Splendid!", "Great!", "Phew!"][r]);
+        setTimeout(showStats, 1600);
+      } else if (lost) {
+        toast(ANSWER, 2500);
+        setTimeout(showStats, 2000);
+      }
+    }, LEN * 250 + 300);
+  }
+
+  function recordStats() {
+    if (previewDate) return;
+    stats.played++;
+    if (state.won) {
+      stats.wins++;
+      stats.dist[state.guesses.length - 1]++;
+      stats.streak = stats.lastWinNum === NUM - 1 ? stats.streak + 1 : 1;
+      stats.lastWinNum = NUM;
+      stats.maxStreak = Math.max(stats.maxStreak, stats.streak);
+    } else {
+      stats.streak = 0;
+    }
+    save(STATS_KEY, stats);
+  }
+
+  // ---- Stats / share -------------------------------------------------------
+  function showStats() {
+    const pct = stats.played ? Math.round(100 * stats.wins / stats.played) : 0;
+    $("stats-nums").innerHTML =
+      [[stats.played, "Played"], [pct, "Win %"], [stats.streak, "Week Streak"], [stats.maxStreak, "Best Streak"]]
+        .map(([n, l]) => `<div><b>${n}</b><span>${l}</span></div>`).join("");
+    const max = Math.max(1, ...stats.dist);
+    $("dist").innerHTML = stats.dist.map((n, i) => {
+      const hi = state.done && state.won && state.guesses.length === i + 1 ? " hi" : "";
+      return `<div class="dist-row"><span>${i + 1}</span><div class="dist-bar${hi}" style="width:${Math.max(8, 100 * n / max)}%">${n}</div></div>`;
+    }).join("");
+    $("answer").innerHTML = state.done && !state.won ? `The word was <b>${ANSWER}</b>` : "";
+    $("share-btn").style.display = state.done ? "block" : "none";
+    $("next").textContent = state.done
+      ? (nextPuzzle ? `Next word: ${nextPuzzle.start}` : "Next word coming soon!")
+      : "Finish this week's puzzle to share your result.";
+    $("stats-modal").classList.add("show");
+  }
+
+  function shareText() {
+    const tries = state.won ? state.guesses.length : "X";
+    const emoji = { correct: "🟩", present: "🟨", absent: "⬛" };
+    const grid = state.guesses.map(g => score(g).map(s => emoji[s]).join("")).join("\n");
+    return `${NAME} #${NUM} ${tries}/${MAX_GUESSES}\n\n${grid}`;
+  }
+
+  $("share-btn").addEventListener("click", async () => {
+    const text = shareText();
+    if (navigator.share && /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      try { await navigator.share({ text }); return; } catch (e) { if (e.name === "AbortError") return; }
+    }
+    try { await navigator.clipboard.writeText(text); toast("Copied! Paste it in the group chat"); }
+    catch { prompt("Copy your result:", text); }
+  });
+
+  $("stats-open").addEventListener("click", showStats);
+  $("help-open").addEventListener("click", () => $("help-modal").classList.add("show"));
+  document.querySelectorAll(".modal-bg").forEach(m => m.addEventListener("click", e => {
+    if (e.target === m || e.target.hasAttribute("data-close")) m.classList.remove("show");
+  }));
+
+  let toastTimer;
+  function toast(msg, ms = 1400) {
+    const t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("show"), ms);
+  }
+
+  // ---- Restore a game in progress -----------------------------------------
+  sizeTiles();
+  window.addEventListener("resize", sizeTiles);
+  state.guesses.forEach((g, r) => { const res = score(g); paintRow(r, g, res, false); colorKeys(g, res); });
+  if (state.done) setTimeout(showStats, 400);
+  else if (!localStorage.getItem("ww-seen-help")) {
+    $("help-modal").classList.add("show");
+    localStorage.setItem("ww-seen-help", "1");
+  }
+})();
+</script>
+</body>
+</html>

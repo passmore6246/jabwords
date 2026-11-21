@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JABwords – word encoder</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #121213; color: #f8f8f8; max-width: 560px; margin: 30px auto; padding: 0 16px; }
+  h1 { font-size: 22px; }
+  label { display: block; margin: 14px 0 4px; font-weight: bold; }
+  input { width: 100%; padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #3a3a3c; background: #1e1e1f; color: #fff; }
+  button { margin-top: 16px; padding: 10px 20px; font-size: 16px; border: 0; border-radius: 6px; background: #538d4e; color: #fff; cursor: pointer; }
+  pre { background: #1e1e1f; border: 1px solid #3a3a3c; padding: 12px; border-radius: 6px; white-space: pre-wrap; word-break: break-all; }
+  .err { color: #ff6b6b; } .muted { color: #818384; font-size: 14px; }
+</style>
+</head>
+<body>
+  <h1>JABwords word encoder</h1>
+  <p class="muted">Make a line for <code>words.js</code>. Paste it inside the <code>WEEKLY_PUZZLES</code> list.
+    The word is scrambled so friends can't spot it by viewing the page source.</p>
+
+  <label for="word">Word (4–8 letters)</label>
+  <input id="word" maxlength="8" autocomplete="off" placeholder="e.g. TACOS">
+  <label for="start">Goes live on</label>
+  <input id="start" type="date">
+  <label for="hint">Hint (optional)</label>
+  <input id="hint" placeholder="e.g. Taco Tuesday week">
+  <button id="go">Make line</button>
+  <p id="err" class="err"></p>
+  <pre id="out" hidden></pre>
+  <button id="copy" hidden>Copy</button>
+
+<script>
+  const $ = id => document.getElementById(id);
+  // Default date: next Monday.
+  const d = new Date();
+  d.setDate(d.getDate() + ((8 - d.getDay()) % 7 || 7));
+  $("start").value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+  $("go").onclick = () => {
+    const word = $("word").value.trim().toUpperCase();
+    $("err").textContent = "";
+    if (!/^[A-Z]{4,8}$/.test(word)) { $("err").textContent = "Use 4 to 8 letters, A–Z only."; return; }
+    if (!$("start").value) { $("err").textContent = "Pick a date."; return; }
+    const code = btoa(word.split("").reverse().join(""));
+    const hint = $("hint").value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+    $("out").textContent = `  { start: "${$("start").value}", code: "${code}", hint: "${hint}" },`;
+    $("out").hidden = false;
+    $("copy").hidden = false;
+  };
+  $("copy").onclick = () => navigator.clipboard.writeText($("out").textContent).then(() => $("copy").textContent = "Copied!");
+</script>
+</body>
+</html>
