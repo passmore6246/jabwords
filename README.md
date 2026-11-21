@@ -20,7 +20,7 @@ A weekly word game for your group chat. You pick each week's word. Your friends 
 2. Type the word (4–8 letters), pick the day it goes live, and add a hint if you want one.
 3. Click **Make line**, then **Copy**, and paste the line into the list in `words.js`.
 
-You can queue up as many weeks ahead as you like. Each puzzle stays live until the next one's start date. The four words in `words.js` now are samples, so replace them.
+You can queue up as many weeks ahead as you like. Each puzzle goes live at 5:00 PM on its start date (use Fridays) and stays up until the next one goes live. The four words in `words.js` now are samples, so replace them.
 
 Words are scrambled, not encrypted. A friend who digs through the code could decode them, but they won't see them by accident.
 
@@ -67,7 +67,7 @@ The link never changes, so the weekly text can say the same thing each time:
 ### iPhone (best option: posts into your real group chat)
 
 1. Open the **Shortcuts** app, go to **Automation**, and tap **+**.
-2. Choose **Time of Day**. Set the time (e.g. 8:00 AM), set **Repeat** to **Weekly**, and pick the day (e.g. Monday).
+2. Choose **Time of Day**. Set the time to **5:01 PM**, set **Repeat** to **Weekly**, and pick **Friday**.
 3. Select **Run Immediately** (so it doesn't ask you first), then tap **Next**.
 4. Add the **Send Message** action. Type the message above and choose the group chat as the recipient.
 5. Tap **Done**.

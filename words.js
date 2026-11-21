@@ -2,14 +2,14 @@
 //  YOUR WEEKLY WORDS
 // ===================================================================
 //  Each entry is one week's puzzle:
-//    start : the day that week's puzzle goes live (YYYY-MM-DD).
-//            The puzzle stays up until the next entry's start date.
+//    start : the Friday that week's puzzle goes live (YYYY-MM-DD). It goes live
+//            at 5:00 PM and stays up until the next Friday at 5:00 PM.
 //    code  : the word, scrambled so friends can't just "view source".
 //            Make codes with admin.html (open it on your computer).
 //    hint  : optional. Shown under the title. Use "" for no hint.
 //
 //  Photos are NOT listed here. They're kept private in the "JABwords Photos"
-//  Google Drive folder, named by week (e.g. 2026-11-23.jpg), and the game
+//  Google Drive folder, named by start date (e.g. 2026-11-27.jpg), and the game
 //  gets only the current week's photo from the results script.
 //
 //  Words can be 4 to 8 letters long. Order doesn't matter.
@@ -18,28 +18,27 @@
 // ===================================================================
 
 window.WEEKLY_PUZZLES = [
-  { start: "2026-11-16", code: "QVpaSVA=", hint: "" },  // sample week, ends Sunday
-  { start: "2026-11-23", code: "RUxQQU0=", hint: "Happy Thanksgiving!" },
-  { start: "2026-11-30", code: "VFNBRUY=", hint: "" },
-  { start: "2026-12-07", code: "VEhHSUw=", hint: "" },
-  { start: "2026-12-14", code: "UkVFSEM=", hint: "" },
-  { start: "2026-12-21", code: "WUxMT0o=", hint: "" },
-  { start: "2026-12-28", code: "WVJSRU0=", hint: "" },
-  { start: "2027-01-04", code: "VFNBT1Q=", hint: "" },
-  { start: "2027-01-11", code: "UkVLT1A=", hint: "" },
-  { start: "2027-01-18", code: "RkVJSEM=", hint: "" },
-  { start: "2027-01-25", code: "U1BPT0g=", hint: "" },
-  { start: "2027-02-01", code: "TExFSFM=", hint: "" },
-  { start: "2027-02-08", code: "RElBTFA=", hint: "" },
-  { start: "2027-02-15", code: "WVRSQVA=", hint: "" },
-  { start: "2027-02-22", code: "S1NJSFc=", hint: "" },
-  { start: "2027-03-01", code: "RUNOQUQ=", hint: "" },
-  { start: "2027-03-08", code: "RU5BTFA=", hint: "" },
-  { start: "2027-03-15", code: "WUROSVc=", hint: "" },
-  { start: "2027-03-22", code: "TEVXT1Q=", hint: "" },
-  { start: "2027-03-29", code: "T0lUQVA=", hint: "" },
-  { start: "2027-04-05", code: "U0RPT1c=", hint: "" },
-  { start: "2027-04-12", code: "UkVUQVc=", hint: "" },
+  { start: "2026-11-20", code: "RUxQQU0=", hint: "Happy Thanksgiving!" },
+  { start: "2026-11-27", code: "VFNBRUY=", hint: "" },
+  { start: "2026-12-04", code: "VEhHSUw=", hint: "" },
+  { start: "2026-12-11", code: "UkVFSEM=", hint: "" },
+  { start: "2026-12-18", code: "WUxMT0o=", hint: "" },
+  { start: "2026-12-25", code: "WVJSRU0=", hint: "" },
+  { start: "2027-01-01", code: "VFNBT1Q=", hint: "" },
+  { start: "2027-01-08", code: "UkVLT1A=", hint: "" },
+  { start: "2027-01-15", code: "RkVJSEM=", hint: "" },
+  { start: "2027-01-22", code: "U1BPT0g=", hint: "" },
+  { start: "2027-01-29", code: "TExFSFM=", hint: "" },
+  { start: "2027-02-05", code: "RElBTFA=", hint: "" },
+  { start: "2027-02-12", code: "WVRSQVA=", hint: "" },
+  { start: "2027-02-19", code: "S1NJSFc=", hint: "" },
+  { start: "2027-02-26", code: "RUNOQUQ=", hint: "" },
+  { start: "2027-03-05", code: "RU5BTFA=", hint: "" },
+  { start: "2027-03-12", code: "WUROSVc=", hint: "" },
+  { start: "2027-03-19", code: "TEVXT1Q=", hint: "" },
+  { start: "2027-03-26", code: "T0lUQVA=", hint: "" },
+  { start: "2027-04-02", code: "U0RPT1c=", hint: "" },
+  { start: "2027-04-09", code: "UkVUQVc=", hint: "" },
 ];
 
 // Shown in the title and the shared results.

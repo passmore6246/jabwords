@@ -161,13 +161,21 @@
   // ?date=YYYY-MM-DD previews another week. Preview games are not saved or recorded.
   const params = new URLSearchParams(location.search);
   const previewDate = /^\d{4}-\d{2}-\d{2}$/.test(params.get("date") || "") ? params.get("date") : null;
-  const today = previewDate || ymd(new Date());
+  // Each puzzle goes live at 5:00 PM (phone's local time) on its start date, a Friday.
+  const LIVE_TIME = "17:00";
+  const nowD = new Date();
+  const now = previewDate ? `${previewDate} 23:59` : `${ymd(nowD)} ${pad(nowD.getHours())}:${pad(nowD.getMinutes())}`;
+  const isLive = p => `${p.start} ${LIVE_TIME}` <= now;
+  const whenLive = p => {
+    const d = new Date(`${p.start}T${LIVE_TIME}:00`);
+    return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }) + " at 5 PM";
+  };
   const puzzles = [...(window.WEEKLY_PUZZLES || [])].sort((a, b) => a.start.localeCompare(b.start));
   let idx = -1;
-  puzzles.forEach((p, i) => { if (p.start <= today) idx = i; });
+  puzzles.forEach((p, i) => { if (isLive(p)) idx = i; });
 
   if (idx === -1) {
-    $("hint").textContent = puzzles.length ? `The first puzzle starts ${puzzles[0].start}. Check back then!` : "No puzzles yet.";
+    $("hint").textContent = puzzles.length ? `The first puzzle starts ${whenLive(puzzles[0])}. Check back then!` : "No puzzles yet.";
     return;
   }
 
@@ -497,7 +505,7 @@
       body.innerHTML = tab === "week" ? weekHTML() : allTimeHTML();
     }
     $("share-btn").style.display = state && state.done ? "block" : "none";
-    $("next").textContent = nextPuzzle ? `Next word: ${nextPuzzle.start}` : "";
+    $("next").textContent = nextPuzzle ? `Next word: ${whenLive(nextPuzzle)}` : "";
   }
 
   async function showResults() {
