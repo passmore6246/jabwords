@@ -9,6 +9,7 @@ A weekly word game for your group chat. You pick each week's word. Your friends 
 | `index.html` | The game. |
 | `words.js` | Your list of weekly words. This is the only file you edit each week. |
 | `admin.html` | A small page that scrambles a word into a line you paste into `words.js`. |
+| `apps-script/Code.gs` | The results server. A copy of what's in the Google Sheet's Apps Script. |
 
 ## Adding words
 
@@ -21,6 +22,15 @@ You can queue up as many weeks ahead as you like. Each puzzle stays live until t
 Words are scrambled, not encrypted. A friend who digs through the code could decode them, but they won't see them by accident.
 
 To check a future week before it goes live, add `?date=` to the address, for example `.../index.html?date=2026-12-08`. Preview games aren't saved.
+
+## Group results
+
+Players pick their name from a list when they open the game. When they finish, their result is saved to a Google Sheet called **JABwords Results** in your Google Drive. Everyone can then see **Weekly results** and **All-time results** in the game.
+
+- **Add or remove players:** edit the **Players** tab of the Sheet (one name per row). The game sorts them A–Z.
+- **See or fix results:** the **Results** tab has one row per finished game. Deleting a row removes that result from the standings.
+- Each person counts once per week. If they open the game on a second phone, it shows the results instead of a new game.
+- The Sheet's web app link is saved in `words.js` as `RESULTS_URL`. If you ever redeploy the script as a *new* deployment, update that link.
 
 ## Putting it online (free, using GitHub Pages)
 

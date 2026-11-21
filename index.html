@@ -15,10 +15,14 @@
   body { display: flex; flex-direction: column; align-items: center; height: 100dvh; }
   header { width: 100%; max-width: 500px; display: flex; align-items: center;
     justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--border); }
-  header h1 { margin: 0; font-size: 26px; letter-spacing: 1px; }
+  header h1 { margin: 0; font-size: 26px; letter-spacing: 1px; text-align: center; }
   header .sub { font-size: 13px; color: var(--muted); text-align: center; }
+  .linkish { background: none; border: 0; color: var(--muted); text-decoration: underline; font-size: 13px; cursor: pointer; padding: 0; }
   .icon-btn { background: none; border: 1px solid var(--border); color: var(--fg); border-radius: 6px;
     font-size: 15px; padding: 6px 10px; cursor: pointer; }
+  #results-links { display: flex; gap: 8px; margin-top: 8px; }
+  #results-links button { background: none; border: 1px solid var(--border); color: var(--fg); border-radius: 16px;
+    padding: 6px 14px; font-size: 14px; font-weight: bold; cursor: pointer; }
   #hint { min-height: 22px; margin: 8px 12px 0; color: var(--muted); font-size: 15px; text-align: center; }
   #board-wrap { flex: 1; display: flex; align-items: center; justify-content: center; width: 100%; padding: 8px; min-height: 0; }
   #board { display: grid; grid-template-rows: repeat(6, 1fr); gap: 5px; }
@@ -44,27 +48,38 @@
   .key.correct { background: var(--correct); } .key.present { background: var(--present); } .key.absent { background: var(--absent); }
   .spacer { flex: 0.5; }
   #toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: var(--fg); color: var(--bg);
-    padding: 12px 16px; border-radius: 6px; font-weight: bold; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 20; }
+    padding: 12px 16px; border-radius: 6px; font-weight: bold; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 30; }
   #toast.show { opacity: 1; }
   .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 10; }
   .modal-bg.show { display: flex; }
-  .modal { background: #1e1e1f; border: 1px solid var(--border); border-radius: 10px; width: min(92vw, 420px);
+  .modal { background: #1e1e1f; border: 1px solid var(--border); border-radius: 10px; width: min(94vw, 440px);
     padding: 20px; position: relative; max-height: 90vh; overflow-y: auto; }
   .modal h2 { margin: 0 0 12px; text-align: center; font-size: 18px; letter-spacing: 1px; }
   .close { position: absolute; top: 8px; right: 12px; background: none; border: 0; color: var(--fg); font-size: 22px; cursor: pointer; }
-  .stats { display: flex; justify-content: space-around; text-align: center; margin-bottom: 16px; }
-  .stats div b { display: block; font-size: 30px; }
-  .stats div span { font-size: 12px; }
-  .dist-row { display: flex; align-items: center; gap: 6px; margin: 4px 0; font-size: 14px; }
-  .dist-bar { background: var(--absent); padding: 2px 8px; text-align: right; font-weight: bold; min-width: 22px; }
-  .dist-bar.hi { background: var(--correct); }
-  .answer { text-align: center; font-size: 15px; margin: 12px 0; }
-  .answer b { letter-spacing: 3px; }
-  #share-btn { display: block; margin: 16px auto 0; background: var(--correct); color: #fff; border: 0; border-radius: 24px;
-    font-size: 18px; font-weight: bold; padding: 12px 32px; cursor: pointer; }
-  .next { text-align: center; color: var(--muted); font-size: 14px; margin-top: 10px; }
   .help p { line-height: 1.4; font-size: 15px; }
   .ex { display: flex; gap: 4px; margin: 6px 0; } .ex .tile { --tile: 36px; }
+  .btn { display: block; margin: 16px auto 0; background: var(--correct); color: #fff; border: 0; border-radius: 24px;
+    font-size: 18px; font-weight: bold; padding: 12px 32px; cursor: pointer; }
+  .btn:disabled { opacity: 0.4; cursor: default; }
+  select { width: 100%; font-size: 18px; padding: 12px; border-radius: 8px; background: #121213; color: var(--fg); border: 1px solid var(--border); }
+  .muted { color: var(--muted); font-size: 14px; text-align: center; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+  .tabs button { flex: 1; padding: 8px; background: none; border: 1px solid var(--border); color: var(--muted);
+    border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; }
+  .tabs button.on { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .answer { text-align: center; font-size: 15px; margin: 0 0 12px; }
+  .answer b { letter-spacing: 3px; }
+  .week-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border); }
+  .week-row .rank { width: 22px; color: var(--muted); font-weight: bold; }
+  .week-row .name { flex: 1; font-weight: bold; }
+  .week-row .name.me { color: #8fd18a; }
+  .week-row .score { font-weight: bold; width: 34px; text-align: right; }
+  .week-row .grid { font-size: 9px; line-height: 1.15; white-space: pre; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 7px 4px; text-align: center; border-top: 1px solid var(--border); }
+  th { color: var(--muted); font-size: 12px; font-weight: normal; border-top: 0; }
+  td:first-child, th:first-child { text-align: left; font-weight: bold; }
+  tr.me td:first-child { color: #8fd18a; }
 </style>
 </head>
 <body>
@@ -72,25 +87,37 @@
     <button class="icon-btn" id="help-open" aria-label="How to play">?</button>
     <div>
       <h1 id="title">JABwords</h1>
-      <div class="sub" id="puzzle-num"></div>
+      <div class="sub"><span id="puzzle-num"></span> <span id="who"></span></div>
     </div>
-    <button class="icon-btn" id="stats-open" aria-label="Statistics">📊</button>
+    <button class="icon-btn" id="results-open" aria-label="Results">📊</button>
   </header>
+  <div id="results-links">
+    <button data-open="week">📅 Weekly results</button>
+    <button data-open="all">🏆 All-time results</button>
+  </div>
   <div id="hint"></div>
   <div id="board-wrap"><div id="board"></div></div>
   <div id="keyboard"></div>
   <div id="toast"></div>
 
-  <div class="modal-bg" id="stats-modal">
+  <div class="modal-bg" id="name-modal">
+    <div class="modal">
+      <h2>WHO'S PLAYING?</h2>
+      <select id="name-select"><option value="">Loading names…</option></select>
+      <button class="btn" id="name-go" disabled>Let's play</button>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="results-modal">
     <div class="modal">
       <button class="close" data-close>&times;</button>
-      <h2>STATISTICS</h2>
-      <div class="stats" id="stats-nums"></div>
-      <h2>GUESS DISTRIBUTION</h2>
-      <div id="dist"></div>
-      <div class="answer" id="answer"></div>
-      <button id="share-btn">Share 📤</button>
-      <div class="next" id="next"></div>
+      <div class="tabs">
+        <button data-tab="week" class="on">This week</button>
+        <button data-tab="all">All time</button>
+      </div>
+      <div id="results-body"></div>
+      <button class="btn" id="share-btn">Share 📤</button>
+      <div class="muted" id="next" style="margin-top:10px"></div>
     </div>
   </div>
 
@@ -106,7 +133,7 @@
       <p><b>Yellow</b>: the letter is in the word, but in a different spot.</p>
       <div class="ex"><div class="tile">C</div><div class="tile">A</div><div class="tile">B</div><div class="tile absent">I</div><div class="tile">N</div></div>
       <p><b>Gray</b>: the letter isn't in the word.</p>
-      <p>When you're done, tap <b>Share</b> and paste your result in the group chat.</p>
+      <p>When you finish, you'll see how everyone did this week and all time. Use the <b>Weekly results</b> and <b>All-time results</b> buttons any time after that.</p>
     </div>
   </div>
 
@@ -115,16 +142,19 @@
 (() => {
   const MAX_GUESSES = 6;
   const NAME = window.GAME_NAME || "JABwords";
+  const API = window.RESULTS_URL || "";
   const $ = id => document.getElementById(id);
   const decode = c => atob(c).split("").reverse().join("").toUpperCase();
   const pad = n => String(n).padStart(2, "0");
   const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const same = (a, b) => String(a).trim().toLowerCase() === String(b).trim().toLowerCase();
 
   document.title = NAME;
   $("title").textContent = NAME;
 
   // ---- Pick this week's puzzle -------------------------------------------
-  // ?date=YYYY-MM-DD lets you preview another week (progress isn't saved).
+  // ?date=YYYY-MM-DD previews another week. Preview games are not saved or recorded.
   const params = new URLSearchParams(location.search);
   const previewDate = /^\d{4}-\d{2}-\d{2}$/.test(params.get("date") || "") ? params.get("date") : null;
   const today = previewDate || ymd(new Date());
@@ -133,9 +163,7 @@
   puzzles.forEach((p, i) => { if (p.start <= today) idx = i; });
 
   if (idx === -1) {
-    $("hint").textContent = puzzles.length
-      ? `The first puzzle starts ${puzzles[0].start}. Check back then!`
-      : "No puzzles yet.";
+    $("hint").textContent = puzzles.length ? `The first puzzle starts ${puzzles[0].start}. Check back then!` : "No puzzles yet.";
     return;
   }
 
@@ -144,20 +172,21 @@
   const LEN = ANSWER.length;
   const NUM = idx + 1;
   const nextPuzzle = puzzles[idx + 1];
-  $("puzzle-num").textContent = `#${NUM} · week of ${puzzle.start}${previewDate ? " (preview)" : ""}`;
+  $("puzzle-num").textContent = `#${NUM}${previewDate ? " (preview)" : ""}`;
   $("hint").textContent = puzzle.hint || "";
 
-  // ---- Saved progress ------------------------------------------------------
-  const STATE_KEY = `ww-state-${puzzle.start}`;
-  const STATS_KEY = "ww-stats";
-  const save = (k, v) => { if (!previewDate) localStorage.setItem(k, JSON.stringify(v)); };
+  // ---- Storage -------------------------------------------------------------
+  const store = (k, v) => { if (!previewDate) localStorage.setItem(k, JSON.stringify(v)); };
   const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch { return d; } };
 
-  let state = previewDate ? null : load(STATE_KEY, null);
-  if (!state || state.answerLen !== LEN) state = { guesses: [], done: false, won: false, answerLen: LEN };
-  let stats = load(STATS_KEY, { played: 0, wins: 0, streak: 0, maxStreak: 0, dist: [0,0,0,0,0,0], lastWinNum: 0 });
+  let player = API ? load("ww-player", "") : "me";
+  let server = { players: [], results: [] };
+  let loaded = !API;
+  let state = null;
   let current = "";
   let busy = false;
+  const stateKey = () => `ww-state-${puzzle.start}-${player}`;
+  const freshState = () => ({ guesses: [], done: false, won: false, grid: "", submitted: false });
 
   // ---- Scoring (handles repeated letters correctly) ------------------------
   function score(guess) {
@@ -172,6 +201,8 @@
     }
     return res;
   }
+  const EMOJI = { correct: "🟩", present: "🟨", absent: "⬛" };
+  const gridOf = guesses => guesses.map(g => score(g).map(s => EMOJI[s]).join("")).join("\n");
 
   // ---- Board ---------------------------------------------------------------
   const board = $("board");
@@ -185,25 +216,23 @@
     const row = document.createElement("div");
     row.className = "row";
     row.style.gridTemplateColumns = `repeat(${LEN}, 1fr)`;
-    for (let c = 0; c < LEN; c++) {
-      const t = document.createElement("div");
-      t.className = "tile";
-      row.appendChild(t);
-    }
+    for (let c = 0; c < LEN; c++) row.appendChild(Object.assign(document.createElement("div"), { className: "tile" }));
     board.appendChild(row);
   }
   const rowEl = r => board.children[r];
   const tileEl = (r, c) => rowEl(r).children[c];
+
+  function clearBoard() {
+    board.querySelectorAll(".tile").forEach(t => { t.className = "tile"; t.textContent = ""; });
+    Object.values(keyEls).forEach(k => { k.className = "key"; delete k.dataset.s; });
+  }
 
   function paintRow(r, word, result, animate) {
     for (let c = 0; c < LEN; c++) {
       const t = tileEl(r, c);
       t.textContent = word[c];
       if (animate) {
-        setTimeout(() => {
-          t.classList.add("flip");
-          setTimeout(() => t.classList.add(result[c]), 250);
-        }, c * 250);
+        setTimeout(() => { t.classList.add("flip"); setTimeout(() => t.classList.add(result[c]), 250); }, c * 250);
       } else {
         t.classList.add(result[c]);
       }
@@ -223,8 +252,7 @@
   // ---- Keyboard ------------------------------------------------------------
   const RANK = { absent: 1, present: 2, correct: 3 };
   const keyEls = {};
-  const layout = ["QWERTYUIOP", "ASDFGHJKL", "+ZXCVBNM-"];
-  layout.forEach((line, i) => {
+  ["QWERTYUIOP", "ASDFGHJKL", "+ZXCVBNM-"].forEach((line, i) => {
     const row = document.createElement("div");
     row.className = "krow";
     if (i === 1) row.appendChild(Object.assign(document.createElement("div"), { className: "spacer" }));
@@ -244,7 +272,7 @@
     if (b) { press(b.dataset.k); b.blur(); }
   });
   document.addEventListener("keydown", e => {
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.ctrlKey || e.metaKey || e.altKey || document.querySelector(".modal-bg.show")) return;
     if (e.key === "Enter") press("ENTER");
     else if (e.key === "Backspace") press("BACK");
     else if (/^[a-z]$/i.test(e.key)) press(e.key.toUpperCase());
@@ -263,16 +291,91 @@
     }
   }
 
+  // ---- Server --------------------------------------------------------------
+  async function fetchServer() {
+    const r = await fetch(API, { cache: "no-store" });
+    const d = await r.json();
+    if (d && Array.isArray(d.results)) server = d;
+  }
+
+  async function submitResult() {
+    if (!API || previewDate || !state.done || state.submitted) return;
+    try {
+      const r = await fetch(API, {
+        method: "POST",
+        body: JSON.stringify({ week: puzzle.start, num: NUM, player, guesses: state.guesses.length || MAX_GUESSES, won: state.won, grid: state.grid }),
+      });
+      const d = await r.json();
+      if (d && Array.isArray(d.results)) {
+        server = d;
+        state.submitted = true;
+        store(stateKey(), state);
+      }
+    } catch (e) {
+      toast("Couldn't save your result. It'll retry next time.", 2500);
+    }
+  }
+
+  // Player names: from the Google Sheet if it loaded, otherwise from words.js. Always A–Z.
+  const roster = () => [...(server.players.length ? server.players : (window.PLAYERS || []))]
+    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+
+  const myServerResult = () => server.results.find(r => r.week === puzzle.start && same(r.player, player));
+
+  // ---- Who's playing -------------------------------------------------------
+  function askName() {
+    const sel = $("name-select");
+    const names = roster();
+    sel.innerHTML = `<option value="">Pick your name…</option>` +
+      names.map(n => `<option${same(n, player) ? " selected" : ""}>${esc(n)}</option>`).join("");
+    if (!names.length) sel.innerHTML = loaded
+      ? `<option value="">No names yet. Ask the organizer to add you.</option>`
+      : `<option value="">Loading names…</option>`;
+    $("name-go").disabled = !sel.value;
+    $("name-modal").classList.add("show");
+  }
+  $("name-select").addEventListener("change", e => { $("name-go").disabled = !e.target.value; });
+  $("name-go").addEventListener("click", () => {
+    player = $("name-select").value;
+    if (!player) return;
+    localStorage.setItem("ww-player", JSON.stringify(player));
+    $("name-modal").classList.remove("show");
+    startAs();
+  });
+
+  function startAs() {
+    $("who").innerHTML = API ? `· ${esc(player)} <button class="linkish" id="change">(not you?)</button>` : "";
+    if ($("change")) $("change").onclick = () => { if (!busy) askName(); };
+    current = "";
+    clearBoard();
+    state = previewDate ? freshState() : load(stateKey(), freshState());
+
+    // Already played this week on another phone? Use that result.
+    const mine = myServerResult();
+    if (mine && !state.done) {
+      state = { guesses: [], done: true, won: mine.won, grid: mine.grid, submitted: true, fromServer: mine.guesses };
+      store(stateKey(), state);
+    }
+
+    state.guesses.forEach((g, r) => { const res = score(g); paintRow(r, g, res, false); colorKeys(g, res); });
+    if (state.done) {
+      submitResult().then(() => setTimeout(showResults, 300));
+    } else if (!localStorage.getItem("ww-seen-help")) {
+      $("help-modal").classList.add("show");
+      localStorage.setItem("ww-seen-help", "1");
+    }
+  }
+
   // ---- Game flow -----------------------------------------------------------
   function press(k) {
-    if (state.done || busy) return;
+    if (!state || state.done || busy || !loaded) return;
     if (k === "BACK") current = current.slice(0, -1);
-    else if (k === "ENTER") return submit();
+    else if (k === "ENTER") return submitGuess();
     else if (current.length < LEN) current += k;
     drawCurrent();
   }
 
-  function submit() {
+  function submitGuess() {
     const r = state.guesses.length;
     if (current.length < LEN) {
       toast("Not enough letters");
@@ -287,62 +390,91 @@
     paintRow(r, guess, result, true);
     const won = guess === ANSWER;
     const lost = !won && state.guesses.length >= MAX_GUESSES;
-    if (won || lost) { state.done = true; state.won = won; recordStats(); }
-    save(STATE_KEY, state);
-    setTimeout(() => {
+    if (won || lost) { state.done = true; state.won = won; state.grid = gridOf(state.guesses); }
+    store(stateKey(), state);
+    const saving = (won || lost) ? submitResult() : null;
+    setTimeout(async () => {
       busy = false;
       colorKeys(guess, result);
-      if (won) {
-        toast(["Genius!", "Magnificent!", "Impressive!", "Splendid!", "Great!", "Phew!"][r]);
-        setTimeout(showStats, 1600);
-      } else if (lost) {
-        toast(ANSWER, 2500);
-        setTimeout(showStats, 2000);
-      }
+      if (won) toast(["Genius!", "Magnificent!", "Impressive!", "Splendid!", "Great!", "Phew!"][r]);
+      else if (lost) toast(ANSWER, 2500);
+      if (saving) { await saving; setTimeout(showResults, won ? 1200 : 1800); }
     }, LEN * 250 + 300);
   }
 
-  function recordStats() {
-    if (previewDate) return;
-    stats.played++;
-    if (state.won) {
-      stats.wins++;
-      stats.dist[state.guesses.length - 1]++;
-      stats.streak = stats.lastWinNum === NUM - 1 ? stats.streak + 1 : 1;
-      stats.lastWinNum = NUM;
-      stats.maxStreak = Math.max(stats.maxStreak, stats.streak);
-    } else {
-      stats.streak = 0;
-    }
-    save(STATS_KEY, stats);
+  // ---- Results -------------------------------------------------------------
+  let tab = "week";
+  function setTab(t) {
+    tab = t;
+    document.querySelectorAll(".tabs button").forEach(x => x.classList.toggle("on", x.dataset.tab === t));
+  }
+  document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => { setTab(b.dataset.tab); renderResults(); }));
+  document.querySelectorAll("#results-links button").forEach(b => b.addEventListener("click", () => { setTab(b.dataset.open); showResults(); }));
+
+  function weekHTML() {
+    const rows = server.results.filter(r => r.week === puzzle.start)
+      .sort((a, b) => (b.won - a.won) || (a.guesses - b.guesses));
+    let h = `<div class="answer">This week's word: <b>${ANSWER}</b></div>`;
+    if (!rows.length) h += `<p class="muted">No results yet.</p>`;
+    rows.forEach((r, i) => {
+      h += `<div class="week-row"><span class="rank">${i + 1}</span>
+        <span class="name${same(r.player, player) ? " me" : ""}">${esc(r.player)}</span>
+        <span class="grid">${esc(r.grid)}</span>
+        <span class="score">${r.won ? r.guesses : "X"}/6</span></div>`;
+    });
+    const waiting = roster().filter(n => !rows.some(r => same(r.player, n)));
+    if (waiting.length) h += `<p class="muted">Still waiting on: ${waiting.map(esc).join(", ")}</p>`;
+    return h;
   }
 
-  // ---- Stats / share -------------------------------------------------------
-  function showStats() {
-    const pct = stats.played ? Math.round(100 * stats.wins / stats.played) : 0;
-    $("stats-nums").innerHTML =
-      [[stats.played, "Played"], [pct, "Win %"], [stats.streak, "Week Streak"], [stats.maxStreak, "Best Streak"]]
-        .map(([n, l]) => `<div><b>${n}</b><span>${l}</span></div>`).join("");
-    const max = Math.max(1, ...stats.dist);
-    $("dist").innerHTML = stats.dist.map((n, i) => {
-      const hi = state.done && state.won && state.guesses.length === i + 1 ? " hi" : "";
-      return `<div class="dist-row"><span>${i + 1}</span><div class="dist-bar${hi}" style="width:${Math.max(8, 100 * n / max)}%">${n}</div></div>`;
-    }).join("");
-    $("answer").innerHTML = state.done && !state.won ? `The word was <b>${ANSWER}</b>` : "";
-    $("share-btn").style.display = state.done ? "block" : "none";
-    $("next").textContent = state.done
-      ? (nextPuzzle ? `Next word: ${nextPuzzle.start}` : "Next word coming soon!")
-      : "Finish this week's puzzle to share your result.";
-    $("stats-modal").classList.add("show");
+  function allTimeHTML() {
+    const by = {};
+    roster().forEach(n => { by[n.toLowerCase()] = { name: n, played: 0, wins: 0, sum: 0, nums: new Set() }; });
+    server.results.forEach(r => {
+      const k = r.player.toLowerCase();
+      const p = by[k] || (by[k] = { name: r.player, played: 0, wins: 0, sum: 0, nums: new Set() });
+      p.played++;
+      if (r.won) { p.wins++; p.sum += r.guesses; p.nums.add(r.num); }
+    });
+    const list = Object.values(by).filter(p => p.played).map(p => {
+      let streak = 0, n = p.nums.has(NUM) ? NUM : NUM - 1;
+      while (p.nums.has(n)) { streak++; n--; }
+      return { ...p, avg: p.wins ? p.sum / p.wins : 99, pct: Math.round(100 * p.wins / p.played), streak };
+    }).sort((a, b) => (b.wins - a.wins) || (a.avg - b.avg) || (b.played - a.played));
+    if (!list.length) return `<p class="muted">No results yet.</p>`;
+    return `<table><tr><th>Player</th><th>Played</th><th>Wins</th><th>Win %</th><th>Avg guesses</th><th>Streak</th></tr>` +
+      list.map(p => `<tr class="${same(p.name, player) ? "me" : ""}"><td>${esc(p.name)}</td><td>${p.played}</td>
+        <td>${p.wins}</td><td>${p.pct}</td><td>${p.wins ? p.avg.toFixed(1) : "–"}</td><td>${p.streak}${p.streak >= 3 ? "🔥" : ""}</td></tr>`).join("") +
+      `</table><p class="muted">Sorted by wins, then fewest average guesses.</p>`;
+  }
+
+  function renderResults() {
+    const body = $("results-body");
+    if (!state || !state.done) {
+      body.innerHTML = `<p class="muted">Finish this week's puzzle to see ${tab === "week" ? "this week's" : "the all-time"} results.</p>`;
+    } else if (!API) {
+      body.innerHTML = `<div class="answer">This week's word: <b>${ANSWER}</b></div><p class="muted">Group results aren't set up yet.</p>`;
+    } else {
+      body.innerHTML = tab === "week" ? weekHTML() : allTimeHTML();
+    }
+    $("share-btn").style.display = state && state.done ? "block" : "none";
+    $("next").textContent = nextPuzzle ? `Next word: ${nextPuzzle.start}` : "";
+  }
+
+  async function showResults() {
+    renderResults();
+    $("results-modal").classList.add("show");
+    if (API && state && state.done) {
+      if (!state.submitted) await submitResult();
+      else { try { await fetchServer(); } catch {} }
+      renderResults();
+    }
   }
 
   function shareText() {
-    const tries = state.won ? state.guesses.length : "X";
-    const emoji = { correct: "🟩", present: "🟨", absent: "⬛" };
-    const grid = state.guesses.map(g => score(g).map(s => emoji[s]).join("")).join("\n");
-    return `${NAME} #${NUM} ${tries}/${MAX_GUESSES}\n\n${grid}`;
+    const tries = state.won ? (state.guesses.length || state.fromServer) : "X";
+    return `${NAME} #${NUM} ${tries}/${MAX_GUESSES}\n\n${state.grid}`;
   }
-
   $("share-btn").addEventListener("click", async () => {
     const text = shareText();
     if (navigator.share && /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
@@ -352,9 +484,10 @@
     catch { prompt("Copy your result:", text); }
   });
 
-  $("stats-open").addEventListener("click", showStats);
+  $("results-open").addEventListener("click", showResults);
   $("help-open").addEventListener("click", () => $("help-modal").classList.add("show"));
   document.querySelectorAll(".modal-bg").forEach(m => m.addEventListener("click", e => {
+    if (m.id === "name-modal") return;
     if (e.target === m || e.target.hasAttribute("data-close")) m.classList.remove("show");
   }));
 
@@ -367,15 +500,18 @@
     toastTimer = setTimeout(() => t.classList.remove("show"), ms);
   }
 
-  // ---- Restore a game in progress -----------------------------------------
+  // ---- Start ---------------------------------------------------------------
   sizeTiles();
   window.addEventListener("resize", sizeTiles);
-  state.guesses.forEach((g, r) => { const res = score(g); paintRow(r, g, res, false); colorKeys(g, res); });
-  if (state.done) setTimeout(showStats, 400);
-  else if (!localStorage.getItem("ww-seen-help")) {
-    $("help-modal").classList.add("show");
-    localStorage.setItem("ww-seen-help", "1");
-  }
+  if (!API) { startAs(); return; }
+  askName();
+  fetchServer()
+    .catch(() => toast("Couldn't load results. You can still play.", 2500))
+    .finally(() => {
+      loaded = true;
+      if (!state) askName();        // refresh the name list now that it has loaded
+      else startAs();               // re-check this player against the server
+    });
 })();
 </script>
 </body>

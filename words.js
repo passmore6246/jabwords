@@ -21,3 +21,11 @@ window.WEEKLY_PUZZLES = [
 
 // Shown in the title and the shared results.
 window.GAME_NAME = "JABwords";
+
+// Backup list of player names, used only if the Google Sheet can't be reached.
+// The real list lives in the "Players" tab of the Google Sheet. Shown A–Z.
+window.PLAYERS = ["Amy", "Andrew", "Becky", "Brandon", "Josh", "Justin"];
+
+// The Google Apps Script web app that records everyone's results.
+// Player names come from the "Players" tab of that Google Sheet.
+window.RESULTS_URL = "https://script.google.com/macros/s/AKfycbzbxBzmfr0vrXbMOCwqy7A-tB3PWyUKW9cQBweCiX0CvW17bFnZXxMl6dUUcdqwfdKYCw/exec";
